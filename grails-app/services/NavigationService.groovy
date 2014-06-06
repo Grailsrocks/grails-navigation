@@ -14,7 +14,7 @@ class NavigationService {
     def reset() {
         byGroup = ['*':[]]
         // re-add the manually defined items
-        grails.util.Holders.config.navigation?.each { k, v ->
+        Holders.config.navigation?.each { k, v ->
             doRegisterItem(k, v)
         }
         manuallyRegistered.each { item ->
