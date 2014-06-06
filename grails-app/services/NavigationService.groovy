@@ -5,12 +5,12 @@ import org.codehaus.groovy.grails.commons.GrailsClassUtils
 class NavigationService {
 
     static transactional = false
-    
+
     def manuallyRegistered = []
     def byGroup = ['*':[]]
     def hidden = new HashSet()
     def activePathByRequestArgs = [:]
-    
+
     def reset() {
         byGroup = ['*':[]]
         // re-add the manually defined items
@@ -51,7 +51,7 @@ class NavigationService {
         }
         return k.toString()
     }
-    
+
     def reverseMapActivePathFor(controller, action, params) {
         // Try first with params
         def kWithParams = makeReverseMapKey(controller, action, params)
@@ -62,7 +62,7 @@ class NavigationService {
         }
         return path ?: kWithParams.tokenize('/')
     }
-    
+
     void calculatePath(pathValue, item) {
         if (pathValue) {
             item.path = pathValue instanceof List ? pathValue : pathValue.tokenize('/')
@@ -75,7 +75,7 @@ class NavigationService {
             }
         }
     }
-    
+
     def populateItem(src, item, controllerGrailsClass) {
         item.action = src.action ?: (controllerGrailsClass ? controllerGrailsClass.defaultAction : 'index')
         item.order = src.order
@@ -99,15 +99,15 @@ class NavigationService {
      * Register a navigation item by convention
      */
     def registerItem(GrailsControllerClass controllerGrailsClass) {
-        def p = [ 
+        def p = [
             controller:controllerGrailsClass.logicalPropertyName
         ]
-        def grp 
+        def grp
         def navInfo = '*'
         if (controllerGrailsClass.clazz.metaClass.hasProperty(controllerGrailsClass.clazz, 'navigation')) {
             navInfo = controllerGrailsClass.clazz.navigation
-            if (navInfo == false) { 
-                return 
+            if (navInfo == false) {
+                return
             }
             if (navInfo == true) {
                 navInfo = '*'
@@ -118,7 +118,7 @@ class NavigationService {
 
             grp = navInfo.group
         } else if (navInfo instanceof List) {
-            // Handle lists of info 
+            // Handle lists of info
             navInfo.each { info ->
                 def params = [:]
                 params.controller = p.controller
@@ -140,7 +140,7 @@ class NavigationService {
         }
         doRegisterItem(grp, p)
     }
-    
+
     /**
      * Manually register a navigation item
      */
@@ -148,24 +148,24 @@ class NavigationService {
         def item = doRegisterItem(group, params)
         manuallyRegistered << [group:group, info:item]
     }
-    
+
     protected doRegisterItem(String group, Collection v) {
         v.eachWithIndex { item, n -> doRegisterItem(group, item, n) }
     }
-    
+
     protected doRegisterItem(String group, Map params, defaultOrderValue = null) {
         params.action = params.action ?: 'index' // @todo should be default action of controller
- 
+
         def item = [:]
         item.controller = params.controller
         if (!params.order) {
             params.order = defaultOrderValue
         }
         populateItem(params, item, null)
-        
+
         def k = makeReverseMapKey(item.controller, item.action, item.params)
         activePathByRequestArgs[ k ] = item.path
-        
+
         if (!group) group = '*'
 
         def catInfo = byGroup[group]
@@ -176,21 +176,21 @@ class NavigationService {
         if (group != '*') {
             byGroup['*'] << item
         }
-        
+
         return item
     }
-    
+
     def hide(String controller) {
         hidden << controller
     }
-    
+
     /**
      * Must be called after you have registered your items, to enforce ordering
      */
     def updated() {
         byGroup.keySet().each { k ->
             byGroup[k] = byGroup[k].findAll { info -> !hidden.contains(info.controller) }
-            byGroup[k] = byGroup[k]?.sort { a, b -> 
+            byGroup[k] = byGroup[k]?.sort { a, b ->
                 if (b.order) {
                     return a.order?.compareTo(b.order) ?: 0
                 } else return +1 // items with no ordering come last
