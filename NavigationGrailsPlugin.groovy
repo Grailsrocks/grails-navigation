@@ -1,8 +1,8 @@
 class NavigationGrailsPlugin {
-    def version = '1.3.2'
+    def version = '1.4.0-SNAPSHOT'
 
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "1.2 > *"
+    def grailsVersion = "2.4 > *"
 
     def dependsOn = [controllers:"1.0 > *"]
     def observe = ['controllers']

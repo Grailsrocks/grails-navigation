@@ -1,5 +1,5 @@
 import org.codehaus.groovy.grails.commons.GrailsControllerClass
-import org.codehaus.groovy.grails.commons.ConfigurationHolder
+import grails.util.Holders
 import org.codehaus.groovy.grails.commons.GrailsClassUtils
 
 // @todo subItem sorting
@@ -15,7 +15,7 @@ class NavigationService {
     def reset() {
         byGroup = ['*':[]]
         // re-add the manually defined items
-        ConfigurationHolder.config.navigation?.each { k, v ->
+        Holders.config.navigation?.each { k, v ->
             doRegisterItem(k, v)
         }
         manuallyRegistered.each { item ->
