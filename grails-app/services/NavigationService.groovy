@@ -6,6 +6,8 @@ class NavigationService {
 
     static transactional = false
 
+    def grailsApplication
+
     def manuallyRegistered = []
     def byGroup = ['*':[]]
     def hidden = new HashSet()
@@ -14,7 +16,7 @@ class NavigationService {
     def reset() {
         byGroup = ['*':[]]
         // re-add the manually defined items
-        Holders.config.navigation?.each { k, v ->
+        grailsApplication.config.navigation?.each { k, v ->
             doRegisterItem(k, v)
         }
         manuallyRegistered.each { item ->
